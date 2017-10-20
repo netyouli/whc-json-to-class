@@ -7,6 +7,7 @@ DEMO
 [Demo演示](http://47.93.2.130/jsonModel/?type=0)
 
 [我的个人网站](http://47.93.2.130/)
+![](https://github.com/netyouli/FunWave/blob/master/demo.gif)
 
 Require
 ==============
