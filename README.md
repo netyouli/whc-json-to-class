@@ -4,9 +4,11 @@
 
 DEMO
 ==============
-[Demo演示](http://47.93.2.130/jsonModel/?type=0)
+[Demo演示](http://47.93.2.130/jsonModel/?type=0)               [PC版](https://github.com/netyouli/WHC_DataModelFactory)
 
-[我的个人网站](http://47.93.2.130/)   [PC版](https://github.com/netyouli/WHC_DataModelFactory)
+
+[我的个人网站](http://47.93.2.130/)
+
 ![](https://github.com/netyouli/jsonToClass/blob/master/demo.png)
 
 Require
