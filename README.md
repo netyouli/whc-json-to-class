@@ -6,8 +6,7 @@ DEMO
 ==============
 [Demo演示](http://47.93.2.130/jsonModel/?type=0)
 
-[我的个人网站](http://47.93.2.130/)
-
+[我的个人网站](http://47.93.2.130/)   [PC版](https://github.com/netyouli/WHC_DataModelFactory)
 ![](https://github.com/netyouli/jsonToClass/blob/master/demo.png)
 
 Require
