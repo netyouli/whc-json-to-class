@@ -26,7 +26,7 @@
   * @github https://github.com/netyouli
   */
 
-var WHCValueType = {
+  var WHCValueType = {
     _Int        : 0,
     _Float      : 1,
     _Boolean    : 2,
@@ -420,14 +420,14 @@ WHCJsonParser.prototype.makeProperty = function(proType, key, value) {
                             property_str = '@property (nonatomic ,copy)NSArray<NSNumber *> * ' + key + '\n';
                             break;
                         case WHCValueType._Dictionary:
-                            property_str = '@property (nonatomic ,strong)NSArray<' + this.makeClassName(key) + ' *> * ' + key + '\n';
+                            property_str = '@property (nonatomic ,copy)NSArray<' + this.makeClassName(key) + ' *> * ' + key + '\n';
                             break;
                         case WHCValueType._Array:
                             if (value.length > 0) {
-                                property_str = '@property (nonatomic ,strong)NSArray<' + this.arrayElementType(key, value[0]) + '> * ' + key + '\n';
+                                property_str = '@property (nonatomic ,copy)NSArray<' + this.arrayElementType(key, value[0]) + '> * ' + key + '\n';
                                 break;
                             }
-                            property_str = '@property (nonatomic ,strong)NSArray<NSObject *> * ' + key + '\n';
+                            property_str = '@property (nonatomic ,copy)NSArray<NSObject *> * ' + key + '\n';
                             break;
                     }
                 }
