@@ -26,7 +26,7 @@
   * @github https://github.com/netyouli
   */
 
-  var WHCValueType = {
+var WHCValueType = {
     _Int        : 0,
     _Float      : 1,
     _Boolean    : 2,
@@ -389,45 +389,45 @@ WHCJsonParser.prototype.makeProperty = function(proType, key, value) {
             switch (proType) {
                 case WHCValueType._Null:
                 case WHCValueType._String: {
-                    property_str = '@property (nonatomic ,copy)NSString * ' + key + '\n';
+                    property_str = '@property (nonatomic ,copy)NSString * ' + key + ';\n';
                     break;
                 }
                 case WHCValueType._Int: {
-                    property_str = '@property (nonatomic ,assign)NSInteger  ' + key + '\n';
+                    property_str = '@property (nonatomic ,assign)NSInteger  ' + key + ';\n';
                     break;
                 }
                 case WHCValueType._Float: {
-                    property_str = '@property (nonatomic ,assign)CGFloat  ' + key + '\n';
+                    property_str = '@property (nonatomic ,assign)CGFloat  ' + key + ';\n';
                     break;
                 }
                 case WHCValueType._Boolean: {
-                    property_str = '@property (nonatomic ,assign)BOOL  ' + key + '\n';
+                    property_str = '@property (nonatomic ,assign)BOOL  ' + key + ';\n';
                     break;
                 }
                 case WHCValueType._Dictionary: {
-                    property_str = '@property (nonatomic ,strong)' + this.makeClassName(key) + ' * ' + key + '\n';
+                    property_str = '@property (nonatomic ,strong)' + this.makeClassName(key) + ' * ' + key + ';\n';
                     break;
                 }
                 case WHCValueType._Array: {
                     let valueInfo = new WHCValue(value);
                     switch (valueInfo.type) {
                         case WHCValueType._String:
-                            property_str = '@property (nonatomic ,copy)NSArray<NSString *> * ' + key + '\n';
+                            property_str = '@property (nonatomic ,copy)NSArray<NSString *> * ' + key + ';\n';
                             break;
                         case WHCValueType._Int:
                         case WHCValueType._Float:
                         case WHCValueType._Boolean:
-                            property_str = '@property (nonatomic ,copy)NSArray<NSNumber *> * ' + key + '\n';
+                            property_str = '@property (nonatomic ,copy)NSArray<NSNumber *> * ' + key + ';\n';
                             break;
                         case WHCValueType._Dictionary:
-                            property_str = '@property (nonatomic ,copy)NSArray<' + this.makeClassName(key) + ' *> * ' + key + '\n';
+                            property_str = '@property (nonatomic ,copy)NSArray<' + this.makeClassName(key) + ' *> * ' + key + ';\n';
                             break;
                         case WHCValueType._Array:
                             if (value.length > 0) {
-                                property_str = '@property (nonatomic ,copy)NSArray<' + this.arrayElementType(key, value[0]) + '> * ' + key + '\n';
+                                property_str = '@property (nonatomic ,copy)NSArray<' + this.arrayElementType(key, value[0]) + '> * ' + key + ';\n';
                                 break;
                             }
-                            property_str = '@property (nonatomic ,copy)NSArray<NSObject *> * ' + key + '\n';
+                            property_str = '@property (nonatomic ,copy)NSArray<NSObject *> * ' + key + ';\n';
                             break;
                     }
                 }
