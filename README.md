@@ -1,5 +1,4 @@
 # whc-json-to-class
-[![Build Status](https://travis-ci.org/netyouli/whc-json-to-class.svg?branch=master)](https://travis-ci.org/netyouli/whc-json-to-class)
 [![Node version](https://img.shields.io/badge/node-%3E%3D4.8.4-brightgreen.svg)](https://www.npmjs.com/package/whc-json-to-class)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 -  The whc-json-to-class is the javascript plug-in that automatically converts the json string to the corresponding language model class
