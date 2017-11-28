@@ -1,0 +1,9 @@
+language: node_js
+node_js:
+  - "4"
+scripts: {
+  "test": "npm test"
+}
+group: "stable"
+dist: "trusty"
+os: "linux"
