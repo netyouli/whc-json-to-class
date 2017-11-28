@@ -1,0 +1,26 @@
+{
+  "name": "whc-json-to-class",
+  "version": "1.0.0",
+  "description": "The whc-json-to-class is the javascript plug-in that automatically converts the json string to the corresponding language model class",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/netyouli/whc-json-to-class.git"
+  },
+  "keywords": [
+    "whc",
+    "json",
+    "to",
+    "class",
+    "whc-json-to-class"
+  ],
+  "author": "wuhaichao",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/netyouli/whc-json-to-class/issues"
+  },
+  "homepage": "https://github.com/netyouli/whc-json-to-class#readme"
+}
