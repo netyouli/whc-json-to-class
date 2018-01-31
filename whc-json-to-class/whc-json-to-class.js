@@ -26,7 +26,7 @@
   * @github https://github.com/netyouli
   */
 
-var WHCValueType = {
+const WHCValueType = {
     _Int        : 0,
     _Float      : 1,
     _Boolean    : 2,
@@ -48,47 +48,48 @@ function WHCValue(value) {
         this.type = WHCValueType._Boolean;
     }else if (this.isArray(value)) {
         this.type = WHCValueType._Array;
-    }else if (value != null) {
+    }else if (value !== null) {
         this.type = WHCValueType._Dictionary;
     }
 }
 
 WHCValue.prototype.isArray = function(value) {
-    return value != null &&
+    return value !== null &&
     typeof value === 'object' &&
-    typeof value.length === 'number' && 
+    value.hasOwnProperty('length') &&
+    typeof value.length === 'number' &&
     typeof value.splice === 'function' &&
     !(value.propertyIsEnumerable('length'));
 };
 
 WHCValue.prototype.isString = function(value) {
-    return value != null &&
+    return value !== null &&
     typeof value === 'string';
-}
+};
 
 WHCValue.prototype.isBoolean = function(value) {
-    return value != null &&
+    return value !== null &&
     typeof value === 'boolean';
-}
+};
 
 WHCValue.prototype.isInt = function(value) {
-    return value != null &&
+    return value !== null &&
     typeof value === 'number' &&
     value === parseInt(value);
-}
+};
 
 WHCValue.prototype.isFloat = function(value) {
-    return value != null &&
+    return value !== null &&
     typeof value === 'number' &&
     value === parseFloat(value);
-}
+};
 
 WHCValue.prototype.isObject = function(value) {
-    return value != null &&
+    return value !== null &&
     value instanceof Object;
-}
+};
 
-var WHCParserLanguage = {
+const WHCParserLanguage = {
     Swift              : 0,
     SwiftClass         : 6,
     SwiftSexyJson      : 7,
@@ -98,7 +99,7 @@ var WHCParserLanguage = {
     Python             : 3,
     Kotlin             : 4,
     CNet               : 5,
-    Unknown            : 6,
+    Unknown            : 9,
 
     /**
      * 返回语言描述
@@ -106,25 +107,25 @@ var WHCParserLanguage = {
     desc : function (type) {
         switch (type) {
             case this.Python:
-                return 'Python'
+                return 'Python';
             case this.Kotlin:
-                return 'Kotlin'
+                return 'Kotlin';
             case this.Swift:
-                return 'Swift'
+                return 'Swift';
             case this.CNet:
-                return 'C#'
+                return 'C#';
             case this.Java:
-                return 'Java'
+                return 'Java';
             case this.SwiftClass:
-                return 'SwiftClass'
+                return 'SwiftClass';
             case this.SwiftSexyJson:
-                return 'SwiftSexyJson'
+                return 'SwiftSexyJson';
             case this.SwiftSexyJsonClass:
-                return 'SwiftSexyJsonClass'
+                return 'SwiftSexyJsonClass';
             case this.OC:
-                return 'Objective-c'
+                return 'Objective-c';
             default:
-                return 'unkown'
+                return 'unkown';
         }
     }
 };
@@ -133,7 +134,7 @@ function WHCJsonParser(type) {
     this.type = type;
     this.classImplementation = '';
     this.classHeader = '';
-    this.rootClassName = 'WHC' 
+    this.rootClassName = 'WHC';
     this.isExistArray = false;
     this.kJavaSetGetString = '    public void setWHCPROPERTY(WHCTYPE WHCProperty){\n\
         this.WHCProperty = WHCProperty;\n\
@@ -204,9 +205,9 @@ WHCJsonParser.prototype.arrayElementType = function(key, element) {
                     }
                     return 'Any'
                 }
-            }       
+            }
             break;
-        case WHCParserLanguage.OC: 
+        case WHCParserLanguage.OC:
             switch (elementInfo.type) {
                 case WHCValueType._String: {
                     return 'NSString *';
@@ -251,7 +252,7 @@ WHCJsonParser.prototype.arrayElementType = function(key, element) {
                     }
                     return 'Object'
                 }
-            }   
+            }
             break;
         case WHCParserLanguage.CNet:
             switch (elementInfo.type) {
@@ -282,7 +283,7 @@ WHCJsonParser.prototype.arrayElementType = function(key, element) {
         default:
             break;
     }
-}
+};
 
 WHCJsonParser.prototype.makeSetGetMothod = function(proType, key, keytype) {
     let setget = '';
@@ -304,12 +305,12 @@ WHCJsonParser.prototype.makeSetGetMothod = function(proType, key, keytype) {
 };
 
 WHCJsonParser.prototype.firstLower = function(key) {
-    if (key != null && key.length > 0) {
-        let first = key.charAt(0)
+    if (key !== void 0 && key.length > 0) {
+        let first = key.charAt(0);
         return key.charAt(0).toLowerCase() + key.substr(1, key.length - 1)
     }
     return '';
-}
+};
 
 WHCJsonParser.prototype.makeProperty = function(proType, key, value) {
     let property_str = '';
@@ -323,7 +324,7 @@ WHCJsonParser.prototype.makeProperty = function(proType, key, value) {
                 case WHCValueType._Null:
                 case WHCValueType._String: {
                     setget_str = this.makeSetGetMothod(proType,key,'String');
-                    property_str = '    var ' + this.makeLowerName(key) + ': String!\n';
+                    property_str = '    var ' + this.makeLowerName(key) + ': String?\n';
                     break;
                 }
                 case WHCValueType._Int: {
@@ -343,7 +344,7 @@ WHCJsonParser.prototype.makeProperty = function(proType, key, value) {
                 }
                 case WHCValueType._Dictionary: {
                     setget_str = this.makeSetGetMothod(proType,key,this.makeClassName(key));
-                    property_str = '    var ' + this.makeLowerName(key) + ': ' + this.makeClassName(key) + "!\n";
+                    property_str = '    var ' + this.makeLowerName(key) + ': ' + this.makeClassName(key) + "?\n";
                     break;
                 }
                 case WHCValueType._Array: {
@@ -351,32 +352,32 @@ WHCJsonParser.prototype.makeProperty = function(proType, key, value) {
                     switch (valueInfo.type) {
                         case WHCValueType._String:
                             setget_str = this.makeSetGetMothod(proType,key,'[String]');
-                            property_str = '    var ' + this.makeLowerName(key) + ': [String]!\n';
+                            property_str = '    var ' + this.makeLowerName(key) + ': [String]?\n';
                             break;
                         case WHCValueType._Int:
                             setget_str = this.makeSetGetMothod(proType,key,'[Int]');
-                            property_str = '    var ' + this.makeLowerName(key) + ': [Int]!\n';
+                            property_str = '    var ' + this.makeLowerName(key) + ': [Int]?\n';
                             break;
                         case WHCValueType._Float:
                             setget_str = this.makeSetGetMothod(proType,key,'[CGFloat]');
-                            property_str = '    var ' + this.makeLowerName(key) + ': [CGFloat]!\n';
+                            property_str = '    var ' + this.makeLowerName(key) + ': [CGFloat]?\n';
                             break;
                         case WHCValueType._Boolean:
                             setget_str = this.makeSetGetMothod(proType,key,'[Bool]');
-                            property_str = '    var ' + this.makeLowerName(key) + ': [Bool]!\n';
+                            property_str = '    var ' + this.makeLowerName(key) + ': [Bool]?\n';
                             break;
                         case WHCValueType._Dictionary:
                             setget_str = this.makeSetGetMothod(proType,key,'[' + this.makeClassName(key) + ']');
-                            property_str = '    var ' + this.makeLowerName(key) + ': [' + this.makeClassName(key) + ']!\n';
+                            property_str = '    var ' + this.makeLowerName(key) + ': [' + this.makeClassName(key) + ']?\n';
                             break;
                         case WHCValueType._Array:
                             if (value.length > 0) {
                                 setget_str = this.makeSetGetMothod(proType,key,'[' + this.arrayElementType(key, value[0]) + ']');
-                                property_str = '    var ' + this.makeLowerName(key) + ': [' + this.arrayElementType(key, value[0]) + ']!\n';
+                                property_str = '    var ' + this.makeLowerName(key) + ': [' + this.arrayElementType(key, value[0]) + ']?\n';
                                 break;
                             }
                             setget_str = this.makeSetGetMothod(proType,key,'[Any]');
-                            property_str = '    var ' + this.makeLowerName(key) + ': [Any]!\n';
+                            property_str = '    var ' + this.makeLowerName(key) + ': [Any]?\n';
                             break;
                     }
                 }
@@ -569,19 +570,19 @@ WHCJsonParser.prototype.makeClassBeginTxt = function(key) {
     switch (this.type) {
         case WHCParserLanguage.Swift:
              begin_txt = '//MARK: - ' + key + ' -\n\n';
-             begin_txt += 'struct ' + this.makeClassName(key) + ' {\n';  
+             begin_txt += 'struct ' + this.makeClassName(key) + ' {\n';
              break;
         case WHCParserLanguage.SwiftClass:
              begin_txt = '//MARK: - ' + key + ' -\n\n';
-             begin_txt += 'class ' + this.makeClassName(key) + ' {\n';  
+             begin_txt += 'class ' + this.makeClassName(key) + ' {\n';
              break;
         case WHCParserLanguage.SwiftSexyJson:
              begin_txt = '//MARK: - ' + key + ' -\n\n';
-             begin_txt += 'struct ' + this.makeClassName(key) + ':SexyJson {\n';  
+             begin_txt += 'struct ' + this.makeClassName(key) + ':SexyJson {\n';
              break;
         case WHCParserLanguage.SwiftSexyJsonClass:
              begin_txt = '//MARK: - ' + key + ' -\n\n';
-             begin_txt += 'class ' + this.makeClassName(key) + ':SexyJson {\n';  
+             begin_txt += 'class ' + this.makeClassName(key) + ':SexyJson {\n';
              break;
         case WHCParserLanguage.OC:
              this.classImplementation += '#pragma mark - ' + key + ' -\n\n';
@@ -592,7 +593,7 @@ WHCJsonParser.prototype.makeClassBeginTxt = function(key) {
         case WHCParserLanguage.Java:
         case WHCParserLanguage.CNet:
              begin_txt = '/*===========' + key +'===========*/\n\n';
-             begin_txt += 'public class ' + this.makeClassName(key) + ' {\n'; 
+             begin_txt += 'public class ' + this.makeClassName(key) + ' {\n';
              break;
         default:
              return '';
@@ -644,7 +645,7 @@ WHCJsonParser.prototype.executeParseEngine = function(object, class_name) {
                     let max_element = null;
                     for (let i in value) {
                         let element = value[i];
-                        if (max_element == null) {
+                        if (max_element === null) {
                             max_element = element;
                         }else if (this.keyCount(max_element) < this.keyCount(element)) {
                             max_element = element;
@@ -686,25 +687,25 @@ WHCJsonParser.prototype.executeParseEngine = function(object, class_name) {
             case WHCValueType._Boolean: {
                 let property_info = this.makeProperty(valueInfo.type, key, value);
                 result += property_info[0];
-                setget += property_info[1]; 
+                setget += property_info[1];
             }
                 break;
             default:
                 break;
         }
     }
-    if (setget && setget != '\n') {
+    if (setget && setget !== '\n') {
         switch (this.type) {
             case WHCParserLanguage.SwiftSexyJson: {
                 let sexy_map = '\n    public mutating func sexyMap(_ map: [String : Any]) {\n';
-                sexy_map += setget;
+                sexy_map += this.autoSexyJsonMapAlign(setget);
                 sexy_map += '\n   }\n';
                 result += sexy_map;
                 break;
             }
             case WHCParserLanguage.SwiftSexyJsonClass: {
                 let sexy_map = '\n    public func sexyMap(_ map: [String : Any]) {\n';
-                sexy_map += setget;
+                sexy_map += this.autoSexyJsonMapAlign(setget);
                 sexy_map += '\n   }\n';
                 result += sexy_map;
                 break;
@@ -741,6 +742,10 @@ import java.util.List;\n' + this.classImplementation;
                         this.classImplementation = 'package ;\n' + this.classImplementation;
                     }
                     break;
+                case WHCParserLanguage.SwiftSexyJson:
+                case WHCParserLanguage.SwiftSexyJsonClass:
+                    this.classImplementation = 'import SexyJson\n' + this.classImplementation;
+                    break;
                 default:
                     break;
             }
@@ -759,4 +764,38 @@ WHCJsonParser.prototype.makeFileRightText = function() {
     let year = date.getFullYear();
     let generatedDate = date.toLocaleString();
     return '\n\n/**\n  * Copyright ' + year + ' wuhaichao.com\n  * Auto-generated:' + generatedDate + '\n  *\n' + '  * @author wuhaichao.com (whc)\n' + '  * @website http://wuhaichao.com\n' + '  * @github https://github.com/netyouli\n' + '  */\n\n\n';
+};
+
+WHCJsonParser.prototype.autoSexyJsonMapAlign = function (content) {
+    let new_content = '';
+    if (content !== void 0) {
+        const rows = content.split('\n');
+        let maxLen = 0;
+        rows.forEach((row) => {
+            "use strict";
+           const index = row.indexOf('<<<');
+            if (index !== -1) {
+                maxLen = Math.max(index, maxLen);
+            }
+        });
+        rows.forEach((row) => {
+            "use strict";
+            const rowindex = row.indexOf('<<<');
+            if (rowindex !== -1 && rowindex < maxLen) {
+                const dindex = maxLen - rowindex;
+                let blank = '';
+                for (let i = 0; i < dindex; i++) {
+                    blank += ' ';
+                }
+                new_content += row.substring(0, rowindex);
+                new_content += blank;
+                new_content += row.substring(rowindex);
+                new_content += '\n';
+            }else {
+                new_content += row;
+                new_content += '\n';
+            }
+        });
+    }
+    return new_content;
 };
