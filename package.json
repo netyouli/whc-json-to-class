@@ -1,6 +1,6 @@
 {
   "name": "whc-json-to-class",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "The whc-json-to-class is the javascript plug-in that automatically converts the json string to the corresponding language model class",
   "main": "index.js",
   "scripts": {
