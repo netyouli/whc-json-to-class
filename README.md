@@ -19,6 +19,8 @@ JavaScript ES6+
 
 Support Languages
 ==============
+WHCParserLanguage.Dart
+
 WHCParserLanguage.Swift
 
 WHCParserLanguage.SwiftClass
