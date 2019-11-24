@@ -100,6 +100,7 @@ const WHCParserLanguage = {
     Kotlin             : 4,
     CNet               : 5,
     Unknown            : 9,
+    Dart               : 10,
 
     /**
      * 返回语言描述
@@ -124,6 +125,8 @@ const WHCParserLanguage = {
                 return 'SwiftSexyJsonClass';
             case this.OC:
                 return 'Objective-c';
+            case this.Dart:
+                return 'Dart';
             default:
                 return 'unkown';
         }
@@ -280,6 +283,32 @@ WHCJsonParser.prototype.arrayElementType = function(key, element) {
                 }
             }
             break;
+        case WHCParserLanguage.Dart:
+                switch (elementInfo.type) {
+                    case WHCValueType._Null:
+                    case WHCValueType._String: {
+                        return 'String';
+                    }
+                    case WHCValueType._Int: {
+                        return 'int';
+                    }
+                    case WHCValueType._Float: {
+                        return 'float';
+                    }
+                    case WHCValueType._Boolean: {
+                        return 'bool';
+                    }
+                    case WHCValueType._Dictionary: {
+                        return this.makeClassName(key);
+                    }
+                    case WHCValueType._Array: {
+                        if (element.length > 0) {
+                            return 'List<' + this.arrayElementType(key, element[0]) + '>';
+                        }
+                        return 'Object';
+                    }
+                }
+                break;
         default:
             break;
     }
@@ -504,6 +533,73 @@ WHCJsonParser.prototype.makeProperty = function(proType, key, value) {
                     break;
             }
             break;
+            case WHCParserLanguage.Dart:
+                switch (proType) {
+                    case WHCValueType._Null:
+                    case WHCValueType._String: {
+                        setget_str = this.makeSetGetMothod(proType,key,'String');
+                        property_str = '    String    ' + this.makeLowerName(key) + ';\n';
+                        break;
+                    }
+                    case WHCValueType._Int: {
+                        setget_str = this.makeSetGetMothod(proType,key,'int');
+                        property_str = '    int    ' + this.makeLowerName(key) + ';\n';
+                        break;
+                    }
+                    case WHCValueType._Float: {
+                        setget_str = this.makeSetGetMothod(proType,key,'float');
+                        property_str = '    float    ' + this.makeLowerName(key) + ';\n';
+                        break;
+                    }
+                    case WHCValueType._Boolean: {
+                        setget_str = this.makeSetGetMothod(proType,key,'bool');
+                        property_str = '    bool    ' + this.makeLowerName(key) + ';\n';
+                        break;
+                    }
+                    case WHCValueType._Dictionary: {
+                        setget_str = this.makeSetGetMothod(proType,key,this.makeClassName(key));
+                        property_str = '    ' + this.makeClassName(key) + '    ' + this.makeLowerName(key) + ';\n';
+                        break;
+                    }
+                    case WHCValueType._Array: {
+                        let valueInfo = new WHCValue(value);
+                        switch (valueInfo.type) {
+                            case WHCValueType._String:
+                                setget_str = this.makeSetGetMothod(proType,key,'List<String>');
+                                property_str = '    List<String>    ' + this.makeLowerName(key) + ';\n';
+                                break;
+                            case WHCValueType._Int:
+                                setget_str = this.makeSetGetMothod(proType,key,'List<int>');
+                                property_str = '    List<int>    ' + this.makeLowerName(key) + ';\n';
+                                break;
+                            case WHCValueType._Float:
+                                setget_str = this.makeSetGetMothod(proType,key,'List<float>');
+                                property_str = '    List<float>    ' + this.makeLowerName(key) + ';\n';
+                                break;
+                            case WHCValueType._Boolean:
+                                setget_str = this.makeSetGetMothod(proType,key,'List<bool>');
+                                property_str = '    List<bool>    ' + this.makeLowerName(key) + ';\n';
+                                break;
+                            case WHCValueType._Dictionary:
+                                setget_str = this.makeSetGetMothod(proType,key,'List<' + this.makeClassName(key) + '>');
+                                property_str = '    List<' + this.makeClassName(key) + '>    ' + this.makeLowerName(key) + ';\n';
+                                break;
+                            case WHCValueType._Array:
+                                if (value.length > 0) {
+                                    setget_str = this.makeSetGetMothod(proType,key,'List<' + this.arrayElementType(key, value[0]) + '>');
+                                    property_str = '    List<' + this.arrayElementType(key, value[0]) + '>    ' + this.makeLowerName(key) + ';\n';
+                                    break;
+                                }
+                                setget_str = this.makeSetGetMothod(proType,key,'List<Object>');
+                                property_str = '    List<Object>    ' + this.makeLowerName(key) + ';\n';
+                                break;
+                        }
+                    }
+                        break;
+                    default:
+                        break;
+                }
+            break;
         case WHCParserLanguage.CNet:
             switch (proType) {
                 case WHCValueType._Null:
@@ -568,6 +664,10 @@ WHCJsonParser.prototype.makeProperty = function(proType, key, value) {
 WHCJsonParser.prototype.makeClassBeginTxt = function(key) {
     let begin_txt = '';
     switch (this.type) {
+        case WHCParserLanguage.Dart:
+            begin_txt = '//MARK: - ' + key + ' -\n\n';
+            begin_txt += 'class ' + this.makeClassName(key) + ' {\n';
+            break;
         case WHCParserLanguage.Swift:
              begin_txt = '//MARK: - ' + key + ' -\n\n';
              begin_txt += 'struct ' + this.makeClassName(key) + ' {\n';
@@ -620,6 +720,7 @@ WHCJsonParser.prototype.makeClassEndTxt = function() {
         case WHCParserLanguage.SwiftSexyJsonClass:
         case WHCParserLanguage.Java:
         case WHCParserLanguage.CNet:
+        case WHCParserLanguage.Dart:
              return '}\n\n';
         case WHCParserLanguage.OC:
              return '@end\n\n';
@@ -640,6 +741,7 @@ WHCJsonParser.prototype.executeParseEngine = function(object, class_name) {
                 let property_info = this.makeProperty(valueInfo.type, key, value);
                 result += property_info[0];
                 setget += property_info[1];
+
                 let content = '';
                 if (value.length > 0) {
                     let max_element = null;
@@ -658,6 +760,9 @@ WHCJsonParser.prototype.executeParseEngine = function(object, class_name) {
                             case WHCValueType._Dictionary:
                                 content += this.makeClassBeginTxt(key);
                                 content += this.executeParseEngine(max_element, key);
+                                if (this.type == WHCParserLanguage.Dart) {
+                                    content += this.makeDartCreateFunc(max_element, key);
+                                }
                                 content += this.makeClassEndTxt();
                                 this.addDidParsedContent(content);
                                 break;
@@ -675,6 +780,9 @@ WHCJsonParser.prototype.executeParseEngine = function(object, class_name) {
                 let content = this.makeClassBeginTxt(key);
                 if (content.length > 0) {
                     content += this.executeParseEngine(value, key);
+                    if (this.type == WHCParserLanguage.Dart) {
+                        content += this.makeDartCreateFunc(value, key);
+                    }
                 }
                 content += this.makeClassEndTxt();
                 this.addDidParsedContent(content);
@@ -718,6 +826,92 @@ WHCJsonParser.prototype.executeParseEngine = function(object, class_name) {
     return result;
 };
 
+WHCJsonParser.prototype.makeDartCreateFunc = function(json_object, className = this.rootClassName) {
+    className = this.makeClassName(className);
+    if (json_object != void 0) {
+        let result = '\n    ' + className + '({';
+        for (const key in json_object) {
+            if (json_object.hasOwnProperty(key)) {
+                result += 'this.' + key + ', ';
+            }
+        }
+        result += '});\n';
+        result += '\n    ' + className + '.fromJson(Map<String, dynamic> json) {\n';
+        for (const key in json_object) {
+            if (json_object.hasOwnProperty(key)) {
+                const value = json_object[key];
+                const valueInfo = new WHCValue(value);
+                switch (valueInfo.type) {
+                    case WHCValueType._Dictionary: {
+                        const subClassName = this.makeClassName(key);
+                        result += '      ' + key + ' = ' + 'json[' + "'" + key + "'] != null ? " + subClassName + '.fromJson(json[' + "'" + key + "']) : null;\n";
+                        break;
+                    }
+                    case WHCValueType._Array: {
+                        if (value.length != 0) {
+                            const v1Info = new WHCValue(value[0]);
+                            if (v1Info.type == WHCValueType._Dictionary) {
+                                const subClassName = this.makeClassName(key);
+                                result += '     if (json[' + "'" + key + "'] != null) {\n";
+                                result += '        ' + key + ' = List<' + subClassName + '>();\n';
+                                result += '        json[' + "'" + key + "'].forEach((v) {\n"
+                                result += '          ' + key + '.add(' + subClassName + '.fromJson(v));\n';
+                                result += '        });\n'
+                                result += '     }\n'
+                            }else {
+                                result += '      ' + key + ' = json[' + "'" + key + "'];\n";        
+                            }
+                        }else {
+                            result += '      ' + key + ' = json[' + "'" + key + "'];\n";
+                        }
+                        break;
+                    }
+                    default:
+                        result += '      ' + key + ' = json[' + "'" + key + "'];\n";
+                        break;
+                }
+            }
+        }
+        result += '\n   }\n'
+        result += '\n    Map<String, dynamic> toJson() {\n';  
+        result += '     final Map<String, dynamic> data = new Map<String, dynamic>();\n';   
+        for (const key in json_object) {
+            if (json_object.hasOwnProperty(key)) {
+                const value = json_object[key];
+                const valueInfo = new WHCValue(value);
+                switch (valueInfo.type) {
+                    case WHCValueType._Dictionary:
+                        result += '     if(this.' + key + ' != null) {\n';
+                        result += '      data[' + "'" + key + "'] = this." + key + '.toJson();\n';
+                        result += '     }\n';
+                        break;
+                    case WHCValueType._Array:
+                        if (value.length != 0) {
+                            const v1Info = new WHCValue(value[0]);
+                            if (v1Info.type == WHCValueType._Dictionary) {
+                                result += '     if (this.' + key + ' != null) {\n';
+                                result += '      data[' + "'" + key + "'] = this." + key + '.map((v) => v.toJson()).toList();\n';
+                                result += '     }\n';
+                            }else {
+                                result += '     data[' + "'" + key + "'] = this." + key + ';\n';
+                            }
+                        }else {
+                            result += '     data[' + "'" + key + "'] = this." + key + ';\n';
+                        }
+                        break;
+                    default:
+                        result += '     data[' + "'" + key + "'] = this." + key + ';\n';
+                        break;
+                }
+            }
+        }
+        result += '     return data;\n';
+        result += '   }\n'
+        return result;
+    }
+    return '';
+};
+
 WHCJsonParser.prototype.startParser = function(json) {
     if (json.length > 0) {
         let json_object = JSON.parse(json);
@@ -732,6 +926,9 @@ WHCJsonParser.prototype.startParser = function(json) {
             this.classImplementation = this.makeFileRightText();
             let content = this.makeClassBeginTxt(this.rootClassName);
             content += this.executeParseEngine(json_object, '');
+            if (this.type == WHCParserLanguage.Dart) {
+                content += this.makeDartCreateFunc(json_object);
+            }
             switch (this.type) {
                 case WHCParserLanguage.Java:
                     if (this.isExistArray) {
