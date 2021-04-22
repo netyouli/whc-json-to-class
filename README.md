@@ -6,10 +6,10 @@
 
 DEMO
 ==============
-[Demo演示](http://www.wuhaichao.com/jsonModel/?type=0)               [PC版](https://github.com/netyouli/WHC_DataModelFactory)
+[Demo演示](http://www.wuhaichao.com/jsonModel/?type=0)         
 
+[PC版](https://github.com/netyouli/WHC_DataModelFactory)
 
-[我的个人网站: www.wuhaichao.com](http://www.wuhaichao.com/)
 
 ![](https://github.com/netyouli/jsonToClass/blob/master/demo.png)
 
